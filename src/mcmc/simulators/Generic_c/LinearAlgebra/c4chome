@@ -1,0 +1,3 @@
+thisdir=`pwd`
+codelib=/home/chris/UniWork/Research/Generic_c
+gcc -lgsl -lgslcblas $codelib/Print/arrvec.c $codelib/LinearAlgebra/cslinalg.c -o test 
