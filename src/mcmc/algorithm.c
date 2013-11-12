@@ -11,8 +11,9 @@
 #include "Output.h"
 #include "update.h"
 #include "simulators/simulators.h"
-
 #include "generic/timings.h"
+void *pODEInfoAlloc(void *pRIv);
+void ODEInfoDeAlloc(void *pOI);
 
 
 void part(st_model_at *model_at, 

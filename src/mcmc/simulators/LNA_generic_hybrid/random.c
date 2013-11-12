@@ -1,6 +1,7 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 
+#include "../Generic_c/LinearAlgebra/cslinalg.h"
 
 // Scratch = workspace of S^2+S;
 void SimulateTruncMVN(int S, double *pmean, double *pVar, 

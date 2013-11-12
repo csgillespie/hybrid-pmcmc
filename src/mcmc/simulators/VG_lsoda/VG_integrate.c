@@ -19,7 +19,7 @@ extern void VG_integrate(double *y,double *t,double * tout,
   int             iwork[liw];
   double  atol,  rtol;
   int itol = 1; //Scalar tolerances
-  int  itask=1, istate=1, iopt=0, jt=2, i;
+  int  itask=1, istate=1, iopt=0, jt=2;
 
   iwork[5]=8000; // does VG mean iwork[6]?
 

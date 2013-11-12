@@ -4,6 +4,8 @@
 #include "mcmc/generic/timings.h"
 #include "mcmc/generic/paths.h"
 #include "mcmc/generic/commandline.h"
+void *pODEInfoAlloc(void *pRIv);
+void ODEInfoDeAlloc(void *pOI);
 
 #include <time.h>
 #include <sys/timeb.h>

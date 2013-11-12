@@ -5,16 +5,15 @@
 
 #include "struct_generic.h"
 #include "../Generic_c/Print/arrvec.h"
-
+ 
 
 void ReadEffectsMatrices(char *pfname, int **ppL, int **ppR, int *pS, int *pR) {
   FILE *pfp=fopen(pfname,"r");
   char *pline = (char*) malloc(301); // max line length
-  char *p;
   int i,j,S,R;
   int currpos=0;
 
-  p=fgets(pline,300,pfp);
+  fgets(pline,300,pfp);
   while (pline[currpos]==' ') {
     currpos++;
   }
@@ -33,7 +32,7 @@ void ReadEffectsMatrices(char *pfname, int **ppL, int **ppR, int *pS, int *pR) {
   for (i=0;i<R;i++) {
     currpos=0;
 
-    p=fgets(pline,300,pfp);
+    fgets(pline,300,pfp);
     printf("%s\n",pline);
 
     for (j=0;j<S;j++) {
@@ -72,14 +71,14 @@ void BracketNext(char *pline, int *pi, int *pj) {
 
 // Fill the Sobs x S matrix that obs = P X + error
 void ReadP(FILE *pfp, int maxlen, int S, int Sobs, double *pP) {
-  char *p, *pline = (char*) malloc(maxlen+1);
+  char *pline = (char*) malloc(maxlen+1);
   int i,j,m,n;
 
-  p = fgets(pline, maxlen, pfp); // ignore remains of the first line 
-  p = fgets(pline, maxlen, pfp); // ignore blank line
+  fgets(pline, maxlen, pfp); // ignore remains of the first line 
+  fgets(pline, maxlen, pfp); // ignore blank line
 
   for (m=0;m<Sobs;m++) {
-    p = fgets(pline, maxlen, pfp);
+    fgets(pline, maxlen, pfp);
     j=-1;
     for (n=0;n<S;n++) {
       BracketNext(pline,&i,&j);
@@ -111,14 +110,13 @@ void LineToObs(char *pline, Observation *pOI) {
 }
 
 void ReadAllObs(FILE *pfp, int maxlen, int nobs, Observation **ppOI) {
-  char *p, *pline = (char*) malloc(maxlen+1);
-  int i,j;
+  char *pline = (char*) malloc(maxlen+1);
+  int i;
 
-  p = fgets(pline, maxlen, pfp); //  blank line
-
+  fgets(pline, maxlen, pfp); //  blank line
   for (i=0;i<nobs;i++) {
-    p = fgets(pline, maxlen, pfp);
-    LineToObs(pline,ppOI[i]);
+    fgets(pline, maxlen, pfp);
+    LineToObs(pline, ppOI[i]);
   }
   free(pline);
 }

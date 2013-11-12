@@ -14,7 +14,7 @@ static double totx2r2=0;
 static double tothr2=0;
 static double tothdtr2=0;
 static double totepsilon=0;
-static double totS=0;
+//static double totS=0;
 
 
 void PrintNFastSlow() {
@@ -86,31 +86,6 @@ void SetHybridInfo(HybridInfo *pHI, int *pA, double *px, double *ph,
     pHI->nfast+=pHI->pifast[i];
     pHI->nslow+=pHI->pislow[i];
     pHI->pslow_c[i] = pc[i] * (double) pHI->pislow[i];
-
-    // CSTMP  why CPU slow
-#ifdef TMPSTUFF
-    if (i==1) {
-      nr2 ++;
-      totx2r2 +=px[1];
-      tothr2 += ph[1];
-      tothdtr2 += ph[1]*deltat;
-      
-      if (pHI->pifast[i]) {
-	nfast2++;
-      }
-      else {
-	nslow2++;
-      }
-    }
-    if (i==3) {
-      if (pHI->pifast[i]) {
-	nfast4++;
-      }
-      else {
-	nslow4++;
-      }
-    }
-#endif
   }
   for (i=0;i<S;i++) {
     pHI->pbstar[i]=0;

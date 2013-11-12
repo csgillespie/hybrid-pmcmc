@@ -22,27 +22,25 @@
 #include "system_spec.h"
 #include "genericODE.h"
 #include "random.h"
-
+#include "../VG_lsoda/VG_integrate.h"
 
 // Which equations should the ODE solver solve?
 // It always performs a deterministic integral for the mean
 
 //#define ODE_VARIANCE    // Simpler and faster than generator
-//#define TWO_MOMENT    // Add 2MA approximation terms to the mean and VARIANCE 
+// - but no good if we need to use the taus
+
 #define ODE_GENERATOR // Use the generator method
 #define ODE_TAU       // Required for hybrid method - needs ODE_GENERATOR
 
 // Allowable combinations
-// ODE_VARIANCE                (for LNAKF)
-// ODE_VARIANCE and TWO_MOMENT (for 2MAKF)
-// ODE_GENERATOR               (for LNAKF - using generator)
+// ODE_VARIANCE                (for LNA only)
+// ODE_GENERATOR               (for LNA only - using generator)
 // ODE_GENERATOR and ODE_TAU   (for hybrid systems)
  
 //#define PRINT_derivinfo  // for debugging
 //#define PRINT_integrate
 //#define PRINT_HYBRID
-
-//#define COMPARE_VARIANCES // if using both ODE_VARIANCE and ODE_GENERATOR
 
 static double epsilon=0.001;
 
@@ -351,41 +349,6 @@ static void Species(int R, int S, int *pA, int maxnspec, int *pS) {
   }
 }
 
-// [Number of] species that contribute to reaction rate (2P->P2 means two)
-static void NumberOfLeftSpecies(int R, int S, int *pA, int *pNLS) {
-  int i,j;
-  for (i=0;i<R;i++) {
-    pNLS[i]=0;
-    for (j=0;j<S;j++) {
-      if (pA[i*S+j]!=0) { 
-	(pNLS[i]) -= pA[i*S+j];
-      }
-    }
-    assert(pNLS[i]<=2);
-  }
-}
-
-static void LeftSpecies(int R, int S, int *pA, int *pLS) {
-  int i,j;
-  for (i=0;i<R;i++) {
-    for (j=0;j<2;j++) {
-      pLS[i*2+j]=-1;
-    }
-  }
-  for (i=0;i<R;i++) {
-    int s=0;
-    for (j=0;j<S;j++) {
-      if (pA[i*S+j]!=0) {
-	pLS[i*2+s] = j;
-	s++;
-      }
-      if (pA[i*S+j]==2) {
-	pLS[i*2+s] = j;
-	s++;
-      } 
-    }
-  }
-}
 
 // [Number of] reactions that cause a net change to each species
 static void NumberOfReactionsNetChange(int R, int S, int *pA, int *pNR) {
@@ -463,53 +426,9 @@ static void ReactionsNetNetCross(int R, int S, int *pA, int maxnreact, int *pRR)
 }
 
 
-static void NumberOfReactionsNetLeftCross(int R, int S, int *pA, int *pAL, 
-					  int *pNRRL) {
-  int i,j,k;
-  for (i=0;i<S;i++) {
-    for (j=0;j<S;j++) { 
-      // Reactions involving species i and j
-      pNRRL[i*S+j]=0;
-      for (k=0;k<R;k++) {
-	if ((pA[k*S+i]!=0) && (pAL[k*S+j]!=0)) {
-	  pNRRL[i*S+j] ++;
-	}
-      } 
-    }
-  }
-}
-
-static void ReactionsNetLeftCross(int R, int S, int *pA, int *pAL, 
-				  int maxnreact, int *pRRL) {
-  int i,j,k;
-
-  for (i=0;i<S;i++) {
-    for (j=0;j<S;j++) { 
-      // Reactions involving species i and j
-      for (k=0;k<maxnreact;k++) {
-	pRRL[i*S*maxnreact+j*maxnreact+k]=-1;
-      }
-    }
-  }
-
-
-  for (i=0;i<S;i++) {
-    for (j=0;j<S;j++) { 
-      // Reactions involving species i and j
-      int r=0;
-      for (k=0;k<R;k++) {
-	if ((pA[k*S+i]!=0) && (pAL[k*S+j]!=0)) {
-	  pRRL[i*S*maxnreact+j*maxnreact+r] =k;
-	  r++;
-	}
-      } 
-    }
-  }
-}
-
 // R reactions, S species, A = net effect matrix
 void AllocReactionInfo(ReactionInfo *pRI) {
-  int S,R,i,j;
+  int S,R;
   int *pA;
 
   get_SR(&pRI->S,&pRI->R);
@@ -736,13 +655,12 @@ extern void lsoda_derivs(int *podedim, double *pt, double *py, double *pdydt, do
   double *pdydt_sq = peta+S;
   double *ptmp = pdydt_sq+3*S+3*S*S+S*(S+1); // u+G+psi+V+tau+psih+Vh
   double *ptmp2 = ptmp+2*S+3*S*S;
-  double *ptmp3= ptmp2 +S*S;
   double *pmetay=(double*)py;
   double *pu=puf(pmetay,S);
   double *pdudt=puf(pdydt,S);
 #ifdef ODE_GENERATOR
   double *pG=pGf(pmetay,S);
-  double *pPsi=pPsif(pmetay,S);
+  //  double *pPsi=pPsif(pmetay,S);
   double *pdGdt=pGf(pdydt,S);
   double *pdPsidt=pPsif(pdydt_sq,S);
 #endif
@@ -751,26 +669,15 @@ extern void lsoda_derivs(int *podedim, double *pt, double *py, double *pdydt, do
   double *pdVdt=pVf(pdydt_sq,S);
 #endif
 #ifdef ODE_TAU
-  double *ptau=ptauf(pmetay,S);
+  //  double *ptau=ptauf(pmetay,S);
   double *pdtaudt=ptauf(pdydt,S);
   double *pS=pSI->pS;
 #endif
   double *pF=pSI->pF;
   double *pS2=pSI->pS2;
-  int i,j,k,pos;  
+  int i,j,k;  
   
-  pos=S;
-
   yL_to_yS((double*)py,(double*)py,S);
-
-#ifdef COMPARE_VARIANCES
-  matrix_invert(S,pG,ptmp);
-  mat_mult(ptmp,pPsi,ptmp2,S,S,S,S,0,0);
-  mat_mult(ptmp2,ptmp,ptmp3,S,S,S,S,0,1);
-  printf("Variance comparison\n");
-  printdmat(S,S,ptmp3);
-  printdmat(S,S,pV);
-#endif
 
   vec_el_op(pu,peta,S,0,'e'); 
   vec_el_op(peta,peta,S,epsilon,'-'); // eta = exp(y) - epsilon
@@ -913,7 +820,7 @@ void ODEInitialise(void *pOI, double t, double *pPostMean, double *pPostVar, dou
 void ODEExtract(void *pOI,double *pPriorMean, double *pPriorVar, double *peta, 
 		double *pt, double *ptmp) {
   ODEInfo *pLI = (ODEInfo*) pOI;
-  int i,S=pLI->S;
+  int S=pLI->S;
   double *pGen = pLI->pGinv;
 
   *pt=pLI->t;
@@ -926,18 +833,11 @@ void ODEExtract(void *pOI,double *pPriorMean, double *pPriorVar, double *peta,
   // Sigma_{prior} = G Psi_{LNA} G^t - calculation checked and works!
   mat_mult(pGen,pLI->pPsi,ptmp,S,S,S,S,0,0);
   mat_mult(ptmp,pGen,pPriorVar,S,S,S,S,0,1);
-#ifdef COMPARE_VARIANCES
-  printf("Var from generator\n");
-  printdmat(S,S,pPriorVar);
-#endif
 #endif
 
 #ifdef ODE_VARIANCE
   memcpy(pPriorVar,pLI->pV,S*S*sizeof(double));
-#ifdef COMPARE_VARIANCES
-  printf("Var from simpler\n");
-  printdmat(S,S,pPriorVar);
-#endif
+
   // Multiplying large pPsi by small G can lead to minor asymmetries
   // which become major when the Kriging (posterior) variance is calculated
   // So squash them now
@@ -1012,7 +912,6 @@ void ODEIntegrateSimulateOne(double t, SDEInfo *pSI, void *pOI, double *pzero,
   double next_potential_hit=ttodo;
   double lammaxslow=-1, lamtotslow;
   double rerr=1.0e-4, aerr=1.0e-4;
-  int actual_hit=1;
   double *pscratch= pSI->pscratch;
   double *ph=(double*) malloc(R*sizeof(double));
   double *pdhdx=(double*) malloc(R*S*sizeof(double));
@@ -1060,8 +959,9 @@ void ODEIntegrateSimulateOne(double t, SDEInfo *pSI, void *pOI, double *pzero,
 
     }
     else { // At least one fast
-      // Special hardcode for when at most two fast reactions and these
-      // only change one species
+      // Find out if at most two fast reactions and these
+      // only change one species.
+      // Specific to our system - but could be generalised to any system
       int shortcut=0;
       memcpy(pxcurr_loop_start,pxcurr,S*sizeof(double));
 
@@ -1084,7 +984,7 @@ void ODEIntegrateSimulateOne(double t, SDEInfo *pSI, void *pOI, double *pzero,
 	double *phybrid=plammaxsl+1;
 	double py[4];
 	double *pc=pSI->pRI->pc;
-	double ph[5],phs[5];
+	double ph[5];
 	double mn,sd,tots,tmp;
 	double ptau[2];
 
@@ -1158,7 +1058,7 @@ void ODEIntegrateSimulateOne(double t, SDEInfo *pSI, void *pOI, double *pzero,
 	  pxcurr[1]=mn+sd*gsl_ran_gaussian(r,1.0);
 	}
 	
-      }
+      }  // shortcut
       else {
 
 	ODEInitialise(pOI,0,pxcurr,pzero,pzero); // set square;tau=0 and psi=0, G=I

@@ -132,7 +132,7 @@ double specdet(int n, double *pmx) {
   double *ptmpmx=(double*) malloc(n*n*sizeof(double));
   gsl_matrix_view m = gsl_matrix_view_array(ptmpmx, n, n);
   double eigenprod=1.0;
-  int i,signum;
+  int signum;
   gsl_permutation *p = gsl_permutation_alloc(n);
 
 // Otherwise MESSES UP pmx
@@ -439,7 +439,7 @@ int mainlinalg(void) {
 0.126578, 0.025561, 4.668233, -2.012706, -0.126575, 
 0.625926, 0.026753, -2.010806, 1.816321, -0.625917, 
 -0.760270, -0.033651, -0.130690, -0.627349, 0.761285};
-  double pM3[4]={1,2,3,4};
+  //  double pM3[4]={1,2,3,4};
   double pM4[6]={5,6,7,8,9,10};
   double pM6[25];
   double pM7[2]={11,12};

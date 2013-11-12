@@ -3,7 +3,8 @@
 
 #include "struct_generic.h"
 #include "hybrid.h"
-
+#include "system_spec.h"
+#include "../Generic_c/Print/arrvec.h"
 
 void PrintReactionInfo(ReactionInfo *pI) {
   int S=pI->S;

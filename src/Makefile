@@ -44,9 +44,9 @@ OBJECTS += $(foreach obj,$(simulator_OBJECTS),$(sim_dir)/$(obj))
 OBJECTS += $(foreach obj,$(mcmc_OBJECTS),$(base_dir)/$(obj)) 
 OBJECTS += $(foreach obj,$(generic_OBJECTS),$(generic_dir)/$(obj)) 
 
-#FILE=timing
+FILE=timing
 
-FILE=pmcmc
+#FILE=pmcmc
 #pmcmc
 
 DEBUG= #-pg 
