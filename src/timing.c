@@ -1,16 +1,15 @@
 #include "headers.h"
 #include "mcmc/mcmc_headers.h"
 #include "mcmc/simulators/simulators.h"
-
-
 #include "mcmc/generic/timings.h"
 #include "mcmc/generic/paths.h"
 #include "mcmc/generic/commandline.h"
+
 #include <time.h>
 #include <sys/timeb.h>
 #include <getopt.h>
 #include <gsl/gsl_randist.h>
-
+#include <math.h>
 
 st_part_at * timingsInitPrior(double X, double Y)
 {
