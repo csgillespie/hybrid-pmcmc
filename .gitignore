@@ -16,3 +16,10 @@
 *.exe
 *.out
 *.app
+
+# R files
+.Rproj.user
+*.Rproj
+README.html
+
+

@@ -12,7 +12,6 @@ FILE* getFile(char filename[100]){
   return(out);
 }
 
-
 void outputMCMCSettings(st_mcmc_settings *mcmc_settings)
 {
   int thin, burn, parts;
@@ -40,8 +39,6 @@ void outputPartSettings(st_part_at *accepted_part)
   printf("#################################\n");
 }
     
-
-
 void outputPartsSettings(st_parts_at *accepted_parts)
 {
   printf("###########Parts values############\n");

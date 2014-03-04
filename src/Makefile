@@ -44,10 +44,8 @@ OBJECTS += $(foreach obj,$(simulator_OBJECTS),$(sim_dir)/$(obj))
 OBJECTS += $(foreach obj,$(mcmc_OBJECTS),$(base_dir)/$(obj)) 
 OBJECTS += $(foreach obj,$(generic_OBJECTS),$(generic_dir)/$(obj)) 
 
-FILE=timing
-
-#FILE=pmcmc
-#pmcmc
+FILE=simulate
+FILE=pmcmc
 
 DEBUG= #-pg 
 
@@ -65,4 +63,4 @@ clean:
 	rm -fv *.o
 
 cleaner: clean
-	rm -fv  output.csv parameters.csv residuals.csv prior.csv
+	rm -fv  *.csv

@@ -37,9 +37,9 @@ int main(int argc, char *argv[])
   dir = createPath(dir, "/");
 
   st_mcmc_settings *mcmc_settings = initMCMCSettings(burn, thin, iters, dir, output_file); 
-
   st_model_at *model_at = initModelAttributes();    
   void (*forwardSimulate)(st_part_at* prop_part, double tstep);
+
   forwardSimulate = getForwardSimulator(argc, argv);
 
   part(model_at, mcmc_settings, forwardSimulate, dir);  

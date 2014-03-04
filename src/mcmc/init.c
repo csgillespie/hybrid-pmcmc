@@ -182,13 +182,11 @@ st_parts_at *initAcceptedParts(st_parts_at *prior_parts)
   return(parts);
 }
 
-
 st_mcmc_settings * initMCMCSettings(int burn, int thin, long iters,
                                     char *dir, char *output_file)
 {
   st_mcmc_settings *mcmc_settings;
   char *filename;
-
     
   mcmc_settings = (st_mcmc_settings *) malloc(sizeof(st_mcmc_settings));
   mcmc_settings->output_file = (FILE *) malloc(sizeof(FILE));
@@ -197,9 +195,8 @@ st_mcmc_settings * initMCMCSettings(int burn, int thin, long iters,
   mcmc_settings->thin = thin;
   mcmc_settings->iters = iters;
 
-
-  filename = createPath("../output/", dir);
-  filename = createPath(filename, output_file);
+  // filename = createPath("../output/", dir);
+  filename = createPath("./", output_file);
   FILE* out = fopen(filename, "w");
   if(NULL==out) {
     printf("Cannot open data file %s\n", filename);
@@ -208,15 +205,14 @@ st_mcmc_settings * initMCMCSettings(int burn, int thin, long iters,
 
   mcmc_settings->output_file = out;
 
-  filename = createPath("../output/", dir);
-  filename = createPath(filename, "timing.csv");
+  //  filename = createPath("../output/", dir);
+  filename = createPath("./", "timing.csv");
   FILE* time_out = fopen(filename, "w");
   if(NULL==time_out) {
     printf("Cannot open data file %s\n", filename);
     exit(1);
   }
   mcmc_settings->timing_file = time_out;
-
 
   printf("###########Output files###################\n");
   printf("%s\n", filename);
