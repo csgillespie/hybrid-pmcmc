@@ -10,17 +10,17 @@ This repository contains the source code for the paper
 To download the code, either clone this repository or download the [zip](https://github.com/csgillespie/hybrid-pmcmc/archive/master.zip) file and unpack.
 
 1. Change to the `src` directory
-```
-cd src
-```
+  ```
+  cd src
+  ```
+2. Type 
+  ```
+  make
+  ```
+  should build the code with no errors and create an executable called `pmcmc`. 
+  Note the `gsl` math library is needed.
 
-1. Type 
-```
-make
-```
-the code should build with no errors and create an execuable called `pmcmc`. Note the code the `gsl` math library is needed.
-
-1. The `pmcmc` has a number of options:
+3. The `pmcmc` executable has a number of options:
  * `-s` the simulator used - either `gillespie`, `hybridLNA`, `hybridSDE`
  * `-n` the number of iterations
  * `-d` the input directory. This directory should contain a sub-directory with the name of the simulator used.
@@ -28,11 +28,10 @@ the code should build with no errors and create an execuable called `pmcmc`. Not
  * `-t` thin - default 1
 
   For example
-```
-./pmcmc -s gillespie -n 1000 -d ../input/inference/run1/ -t 2
-```
-
-1. Running the code will create two files:
+  ```
+  ./pmcmc -s gillespie -n 1000 -d ../input/inference/run1/ -t 2
+  ```
+4. Running the `pmcmc` executable will create two files:
 
  * `name_of_simulator.csv` - mcmc output;
  * `timing.csv` - run time (in seconds)
